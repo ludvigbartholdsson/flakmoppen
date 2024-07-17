@@ -4,7 +4,6 @@ import { supabase } from '$lib/server/supabase/client';
 export const handle: Handle = async ({ event, resolve }) => {
 	const authCookie = event.cookies.get('administratorAuthKey');
 
-	console.log(authCookie, event.url.pathname);
 	if (!authCookie && event.url.pathname.startsWith('dashboard')) {
 		throw redirect(307, '/dashboard-login');
 	}
