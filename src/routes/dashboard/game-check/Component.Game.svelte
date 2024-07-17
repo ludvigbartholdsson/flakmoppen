@@ -6,8 +6,10 @@
 	<h3>{game.displayName}</h3>
 	<p>{game.description}</p>
 	<hr class="my-4" />
-	<a href="/dashboard/game-check/questions/{game.id}" class="cta mt-3"
-		>Uppdatera frågor (rekommenderas på datorn)</a
-	>
+	{#if !game.started}
+		<a href="/dashboard/game-check/questions/{game.id}" class="cta mt-3"
+			>Uppdatera frågor (rekommenderas på datorn)</a
+		>
+	{/if}
 	<a href="/dashboard/game-check/control/{game.id}" class="cta mt-3">Kontrollpanel</a>
 </div>

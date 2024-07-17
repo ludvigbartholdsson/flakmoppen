@@ -4,22 +4,22 @@
 	import { invalidate } from '$app/navigation';
 	import { expoOut } from 'svelte/easing';
 	import { supabaseClient } from '$lib/supabase/client';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let data: PageServerData;
 
 	let participants = data.gameParticipants!;
-	$: startedButNotCompleted = data.gameQuestions.find(
-		(q) => q.started && q.completed && new Date(q.completed) > new Date()
-	);
+
 	$: lastCompletedQuestion =
-		data.gameQuestions.find((q) => q.completed && new Date(q.completed) < new Date())
+		data.gameQuestions.findLast((q) => q.completed && new Date(q.completed) < new Date())
 			?.questionOrder ?? 0;
+	$: activeQuestion = data.activeQuestion;
 
 	let startQuestionCompleted = '';
-
 	let startGameError = '';
 	let startQuestionError = '';
 	let startQuestionOrder: number | null = null;
+	let extendQuestionTimeError = '';
 
 	const handleNewPlayers = (payload: any) => {
 		console.log('New player', payload);
@@ -35,6 +35,10 @@
 			handleNewPlayers
 		)
 		.subscribe();
+
+	async function activatePoints(points: number) {
+		// TODO
+	}
 
 	async function startQuestion(questionOrder: number) {
 		if (startQuestionOrder && startQuestionOrder !== questionOrder) {
@@ -64,6 +68,27 @@
 		}
 	}
 
+	async function extendQuestionTime(questionId: number) {
+		confirm('Är du säker? Detta kommer förlänga tiden för frågan med 30 sekunder.');
+		extendQuestionTimeError = '';
+
+		const resp = await fetch('/api/dashboard/extend-question-time', {
+			method: 'POST',
+			body: JSON.stringify({
+				gameId: data.game.id,
+				questionId
+			})
+		});
+
+		if (resp.ok) {
+			invalidate('game');
+
+			extendQuestionTimeError = '';
+		} else {
+			extendQuestionTimeError = await resp.text();
+		}
+	}
+
 	async function startGame() {
 		confirm('Är du säker? Detta kommer göra så att ingen ny kan ansluta!');
 
@@ -80,6 +105,28 @@
 			startGameError = await resp.text();
 		}
 	}
+
+	// Listen to question updates
+	let activeQuestionTimer: NodeJS.Timeout | null = null;
+	function checkActiveQuestion() {
+		const currentTime = new Date().toISOString();
+		if (activeQuestion && activeQuestion?.completed && currentTime > activeQuestion.completed) {
+			lastCompletedQuestion = activeQuestion.questionOrder;
+			activeQuestion = null;
+			console.log('Question completed, no active question.');
+		}
+	}
+
+	// Check every second if the question has completed
+	onMount(() => {
+		activeQuestionTimer = setInterval(checkActiveQuestion, 1000);
+	});
+
+	onDestroy(() => {
+		if (activeQuestionTimer) {
+			clearInterval(activeQuestionTimer);
+		}
+	});
 </script>
 
 <section>
@@ -148,18 +195,35 @@
 						<p>Typ av fråga: {question.type === 'paSparet' ? 'På Spåret' : 'Kahoot'}</p>
 					</div>
 
-					{#if startedButNotCompleted && startedButNotCompleted.id === question.id}
+					{#if activeQuestion && activeQuestion.id === question.id}
 						<div>
 							<hr class="my-4" />
 							<h3 class="text-green-400">FRÅGAN ÄR STARTAD</h3>
-							<p>Startad: {new Date(startedButNotCompleted.started).toLocaleString()}</p>
-							{#if question.type === 'kahoot'}
-								<p>Avslutas: {new Date(startedButNotCompleted.completed).toLocaleString()}</p>
+							<p>Startad: {new Date(activeQuestion.started).toLocaleString()}</p>
+							<p>Avslutas: {new Date(activeQuestion.completed).toLocaleString()}</p>
+							<p>Poängsats om man svarar nu: TODO</p>
+							<button class="cta mt-3" on:click={() => extendQuestionTime(question.id)}
+								>Förläng svarstiden med 30s</button
+							>
+							{#if extendQuestionTimeError}
+								<div class="bg-red-300 px-4 py-2 rounded-md">
+									{extendQuestionTimeError}
+								</div>
+							{/if}
+							{#if question.type === 'paSparet'}
+								<div class="mt-3 gap-3 flex flex-row flex-wrap">
+									<button on:click={() => activatePoints(10)} class="cta">Aktivera 10 poäng</button>
+									<button on:click={() => activatePoints(8)} class="cta">Aktivera 8 poäng</button>
+									<button on:click={() => activatePoints(5)} class="cta">Aktivera 5 poäng</button>
+									<button on:click={() => activatePoints(3)} class="cta">Aktivera 3 poäng</button>
+									<button on:click={() => activatePoints(2)} class="cta">Aktivera 2 poäng</button>
+									<button on:click={() => activatePoints(1)} class="cta">Aktivera 1 poäng</button>
+								</div>
 							{/if}
 						</div>
 					{/if}
 
-					{#if data.game.started && !data.game.completed && question.questionOrder - 1 === lastCompletedQuestion && !startedButNotCompleted}
+					{#if data.game.started && !data.game.completed && question.questionOrder - 1 === lastCompletedQuestion && !activeQuestion}
 						<div>
 							<hr class="my-4" />
 							{#if question.type === 'kahoot'}

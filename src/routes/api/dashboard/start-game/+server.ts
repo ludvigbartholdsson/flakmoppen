@@ -17,6 +17,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return error(400, 'Game already started, or game doesnt exist');
 	}
 
+	// get questions
+	const questions = await supabase.from('gameQuestion').select().eq('gameId', gameId);
+
+	if (!questions.error && questions.data.length === 0) {
+		return error(400, 'No questions added to game');
+	}
+
 	// Update
 	await supabase.from('games').update({ started: new Date().toISOString() }).eq('id', gameId);
 

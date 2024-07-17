@@ -17,8 +17,19 @@ export const load = (async ({ params, depends }) => {
 		return error(404, 'Game not found');
 	}
 
+	const activeQuestion = await supabase
+		.from('gameQuestion')
+		.select('*')
+		.eq('gameId', params.gameId)
+		.filter('started', 'lte', new Date().toISOString())
+		.filter('completed', 'gte', new Date().toISOString())
+		.order('questionOrder', { ascending: true })
+		.limit(1)
+		.single();
+
 	return {
 		game: game.data,
+		activeQuestion: activeQuestion.data,
 		gameQuestions: gameQuestions.data ?? [],
 		gameParticipants: gameParticipants.data ?? []
 	};

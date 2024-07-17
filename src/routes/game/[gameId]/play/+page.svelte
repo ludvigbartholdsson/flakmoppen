@@ -8,7 +8,7 @@
 	export let data: PageServerData;
 	import { onMount, onDestroy } from 'svelte';
 
-	$: participants = data.participants!;
+	$: participants = data.participants! ?? [];
 	$: activeQuestion = data.activeQuestion;
 
 	let answerToQuestion = '';
