@@ -9,7 +9,7 @@
 	<div class="container py-6">
 		<h1>Välkommen!</h1>
 		<h3>
-			av ludvig bartholdsson. <a href="/dashboard" class="text-green-600">Gå till dashboard</a>.
+			av mini bartis. <a href="/dashboard" class="text-green-600">Gå till dashboard</a>.
 		</h3>
 	</div>
 	<div class="container py-6">
