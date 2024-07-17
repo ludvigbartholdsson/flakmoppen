@@ -9,11 +9,6 @@ export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 		return error(400, 'PhoneNumber and password are required');
 	}
 
-	// Check permission
-	if (!locals?.user) {
-		return error(403, 'Unauthorized');
-	}
-
 	const { data } = await supabase
 		.from('administrator')
 		.select()

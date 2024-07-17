@@ -4,21 +4,30 @@ import { supabase } from '$lib/server/supabase/client';
 export const handle: Handle = async ({ event, resolve }) => {
 	const authCookie = event.cookies.get('administratorAuthKey');
 
-	if (!authCookie) {
-		throw redirect(301, '/dashboard-login');
+	console.log(authCookie, event.url.pathname);
+	if (!authCookie && event.url.pathname.startsWith('dashboard')) {
+		throw redirect(307, '/dashboard-login');
 	}
 
-	const { data } = await supabase.from('administrator').select().eq('authKey', authCookie);
+	if (authCookie) {
+		const { data } = await supabase
+			.from('administrator')
+			.select()
+			.eq('authKey', authCookie)
+			.single();
 
-	if (!data || data.length === 0) {
-		throw redirect(301, '/dashboard-login');
+		if (!data && event.url.pathname.startsWith('dashboard')) {
+			throw redirect(307, '/dashboard-login');
+		}
+
+		if (data) {
+			event.locals.user = {
+				firstName: data.firstName,
+				lastName: data.lastName,
+				phoneNumber: data.phoneNumber
+			};
+		}
 	}
-
-	event.locals.user = {
-		firstName: data[0].firstName,
-		lastName: data[0].lastName,
-		phoneNumber: data[0].phoneNumber
-	};
 
 	const response = await resolve(event);
 	return response;

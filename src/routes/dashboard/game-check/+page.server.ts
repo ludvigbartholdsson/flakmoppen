@@ -6,7 +6,7 @@ export const load = (async () => {
 		.from('games')
 		.select()
 		.not('started', 'is', null)
-		.not('completed', 'is', null);
+		.is('completed', null);
 	const { data: comingData } = await supabase.from('games').select().is('started', null);
 	const { data: oldData } = await supabase.from('games').select().not('completed', 'is', null);
 
