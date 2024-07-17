@@ -3,13 +3,18 @@ import type { RequestHandler } from './$types';
 import { supabase } from '$lib/server/supabase/client';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const authKey = cookies.get('gameParticipantAuthKey');
+	const { gameId, questionId, answer } = await request.json();
+	const authKeys = cookies.get('gameParticipantAuthKeys');
+
+	if (!authKeys) {
+		return error(401, 'Unauthorized');
+	}
+
+	const authKey = JSON.parse(authKeys).find((e) => e.gameId === parseInt(gameId))?.authKey;
 
 	if (!authKey) {
 		return error(401, 'Unauthorized');
 	}
-
-	const { gameId, questionId, answer } = await request.json();
 
 	// get user participant
 	const participant = await supabase

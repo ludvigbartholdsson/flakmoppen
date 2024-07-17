@@ -41,7 +41,23 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	// set cookie
 	if (insertData.data) {
-		cookies.set('gameParticipantAuthKey', insertData.data.authKey, {
+		let currentAuthKeys: any[] = [];
+
+		if (cookies.get('gameParticipantAuthKeys')) {
+			currentAuthKeys = JSON.parse(cookies.get('gameParticipantAuthKeys')!);
+
+			const thisGame = currentAuthKeys.findIndex((e) => e.gameId === body.gameId);
+			if (thisGame !== -1) {
+				currentAuthKeys.splice(thisGame, 1);
+			}
+		}
+
+		currentAuthKeys.push({
+			gameId: body.gameId,
+			authKey: insertData.data.authKey
+		});
+
+		cookies.set('gameParticipantAuthKeys', JSON.stringify(currentAuthKeys), {
 			path: '/',
 			httpOnly: true,
 			secure: true

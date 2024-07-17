@@ -3,7 +3,15 @@ import type { PageServerLoad } from './$types';
 
 export const load = (async ({ cookies, params, depends }) => {
 	depends('game');
-	const authKey = cookies.get('gameParticipantAuthKey');
+	const authKeys = cookies.get('gameParticipantAuthKeys');
+
+	if (!authKeys) {
+		return {
+			participant: null
+		};
+	}
+
+	const authKey = JSON.parse(authKeys).find((e) => e.gameId === parseInt(params.gameId))?.authKey;
 
 	if (!authKey) {
 		return {
@@ -41,7 +49,6 @@ export const load = (async ({ cookies, params, depends }) => {
 			.eq('questionId', activeQuestion.data.id)
 			.single();
 
-		console.log(hasUserAnsweredOnActiveQuestion);
 		userAnswerDetails = hasUserAnsweredOnActiveQuestion.data;
 	}
 
