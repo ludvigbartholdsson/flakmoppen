@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+h1 {
+	@apply text-4xl font-bold mb-1;
+}
+
+h2 {
+	@apply text-3xl font-semibold mb-1;
+}
+
+h3 {
+	@apply text-xl font-semibold mb-1;
+}
+
+p {
+	@apply text-base leading-tight;
+}
+
+.cta {
+	@apply bg-green-300 block text-center font-semibold hover:bg-green-500 rounded-md px-5 py-2;
+}
+
+.input {
+	@apply bg-gray-100 rounded-md w-full text-base px-3 py-2 ring-2 ring-transparent mt-1 focus:ring-green-300 transition-all !outline-none;
+}
