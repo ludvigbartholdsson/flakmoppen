@@ -8,7 +8,9 @@
 	<img class="w-full object-cover h-56" src="/images/landing-page/hero.png" alt="" />
 	<div class="container py-6">
 		<h1>Välkommen!</h1>
-		<h3>Hoppas hemsidan fungerar :)</h3>
+		<h3>
+			av ludvig bartholdsson med. <a href="/dashboard" class="text-green-400">Gå till dashboard</a>
+		</h3>
 	</div>
 	<div class="container py-6">
 		<h2 class="mb-3">Aktiva evenemang</h2>
