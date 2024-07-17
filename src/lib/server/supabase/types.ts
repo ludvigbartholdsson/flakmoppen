@@ -46,6 +46,7 @@ export type Database = {
           gameId: number
           id: number
           lastChange: string
+          totalPoints: number
         }
         Insert: {
           created?: string
@@ -53,6 +54,7 @@ export type Database = {
           gameId: number
           id?: number
           lastChange?: string
+          totalPoints?: number
         }
         Update: {
           created?: string
@@ -60,6 +62,7 @@ export type Database = {
           gameId?: number
           id?: number
           lastChange?: string
+          totalPoints?: number
         }
         Relationships: [
           {
@@ -106,30 +109,116 @@ export type Database = {
           },
         ]
       }
+      gameQuestion: {
+        Row: {
+          completed: string | null
+          description: string | null
+          gameId: number
+          header: string
+          id: number
+          questionOrder: number
+          started: string | null
+          type: string
+        }
+        Insert: {
+          completed?: string | null
+          description?: string | null
+          gameId: number
+          header: string
+          id?: number
+          questionOrder: number
+          started?: string | null
+          type: string
+        }
+        Update: {
+          completed?: string | null
+          description?: string | null
+          gameId?: number
+          header?: string
+          id?: number
+          questionOrder?: number
+          started?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gameQuestions_gameId_fkey"
+            columns: ["gameId"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gameQuestionParticipantAnswers: {
+        Row: {
+          answer: string
+          created: string | null
+          id: number
+          participantId: number
+          pointsOnCorrect: number
+          questionId: number
+        }
+        Insert: {
+          answer: string
+          created?: string | null
+          id?: number
+          participantId: number
+          pointsOnCorrect: number
+          questionId: number
+        }
+        Update: {
+          answer?: string
+          created?: string | null
+          id?: number
+          participantId?: number
+          pointsOnCorrect?: number
+          questionId?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gameQuestionParticipantAnswers_participantId_fkey"
+            columns: ["participantId"]
+            isOneToOne: false
+            referencedRelation: "gameParticipant"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gameQuestionParticipantAnswers_questionId_fkey"
+            columns: ["questionId"]
+            isOneToOne: false
+            referencedRelation: "gameQuestion"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
-          AvailableToJoin: string
+          completed: string | null
           created: string
           description: string
           displayName: string
           id: number
           lastChange: string | null
+          started: string | null
         }
         Insert: {
-          AvailableToJoin: string
+          completed?: string | null
           created?: string
           description: string
           displayName: string
           id?: number
           lastChange?: string | null
+          started?: string | null
         }
         Update: {
-          AvailableToJoin?: string
+          completed?: string | null
           created?: string
           description?: string
           displayName?: string
           id?: number
           lastChange?: string | null
+          started?: string | null
         }
         Relationships: []
       }
@@ -138,7 +227,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_question_order: {
+        Args: {
+          gameid_param: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

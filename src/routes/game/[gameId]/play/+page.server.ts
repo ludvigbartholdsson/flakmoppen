@@ -1,7 +1,8 @@
 import { supabase } from '$lib/server/supabase/client';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ cookies, params }) => {
+export const load = (async ({ cookies, params, depends }) => {
+	depends('game');
 	const authKey = cookies.get('gameParticipantAuthKey');
 
 	if (!authKey) {
@@ -20,9 +21,35 @@ export const load = (async ({ cookies, params }) => {
 	const participants =
 		(await supabase.from('gameParticipant').select().eq('gameId', params.gameId)).data ?? [];
 
+	const activeQuestion = await supabase
+		.from('gameQuestion')
+		.select('*')
+		.eq('gameId', params.gameId)
+		.filter('started', 'lte', new Date().toISOString())
+		.filter('completed', 'gte', new Date().toISOString())
+		.order('questionOrder', { ascending: true })
+		.limit(1)
+		.single();
+
+	let userAnswerDetails = null;
+
+	if (activeQuestion.data && participant.data) {
+		const hasUserAnsweredOnActiveQuestion = await supabase
+			.from('gameQuestionParticipantAnswers')
+			.select('answer')
+			.eq('participantId', participant.data.participantId)
+			.eq('questionId', activeQuestion.data.id)
+			.single();
+
+		console.log(hasUserAnsweredOnActiveQuestion);
+		userAnswerDetails = hasUserAnsweredOnActiveQuestion.data;
+	}
+
 	return {
 		game: game.data,
 		participant: participant.data,
-		participants: participants.sort((a, b) => new Date(b.created) - new Date(a.created))
+		participants: participants.sort((a, b) => new Date(b.created) - new Date(a.created)),
+		activeQuestion: activeQuestion.data ?? null,
+		activeQuestionAnswer: userAnswerDetails
 	};
 }) satisfies PageServerLoad;

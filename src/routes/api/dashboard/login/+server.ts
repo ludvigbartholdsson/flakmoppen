@@ -2,11 +2,16 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { supabase } from '$lib/server/supabase/client';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, locals, cookies }) => {
 	const { phoneNumber, password } = await request.json();
 
 	if (!phoneNumber || !password) {
 		return error(400, 'PhoneNumber and password are required');
+	}
+
+	// Check permission
+	if (!locals?.user) {
+		return error(403, 'Unauthorized');
 	}
 
 	const { data } = await supabase

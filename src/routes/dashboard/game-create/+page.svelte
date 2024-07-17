@@ -3,7 +3,6 @@
 
 	let displayName = '';
 	let description = '';
-	let availableToJoin = '';
 
 	let error = '';
 
@@ -15,8 +14,7 @@
 			},
 			body: JSON.stringify({
 				displayName,
-				description,
-				availableToJoin: availableToJoin
+				description
 			})
 		});
 
@@ -44,12 +42,6 @@
 	<div>
 		<label for="displayName">Kort beskrivning</label>
 		<input id="displayName" bind:value={description} class="input" />
-	</div>
-	<div>
-		<label for="datetime"
-			>Sista tiden man kan ansluta, alltså när spelet bör börja minus någon minut</label
-		>
-		<input id="datetime" type="datetime-local" bind:value={availableToJoin} class="input" />
 	</div>
 	{#if error}
 		<div class="bg-red-300 px-4 py-2 rounded-md">

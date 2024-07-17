@@ -9,7 +9,7 @@
 	<div class="container py-6">
 		<h1>Välkommen!</h1>
 		<h3>
-			av ludvig bartholdsson med. <a href="/dashboard" class="text-green-400">Gå till dashboard</a>
+			av ludvig bartholdsson. <a href="/dashboard" class="text-green-600">Gå till dashboard</a>.
 		</h3>
 	</div>
 	<div class="container py-6">
@@ -19,9 +19,10 @@
 				<h3>{game.displayName}</h3>
 				<p>{game.description}</p>
 				<hr class="my-4" />
-				<p>Du kan delta till och med {new Date(game.AvailableToJoin).toLocaleString()}.</p>
 				<a href="/game/{game.id}" class="cta mt-3">Delta nu</a>
 			</div>
+		{:else}
+			N/A
 		{/each}
 	</div>
 </section>
