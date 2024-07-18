@@ -117,6 +117,7 @@ export type Database = {
           header: string
           id: number
           questionOrder: number
+          realtimePointsNow: number
           started: string | null
           type: string
         }
@@ -127,6 +128,7 @@ export type Database = {
           header: string
           id?: number
           questionOrder: number
+          realtimePointsNow?: number
           started?: string | null
           type: string
         }
@@ -137,6 +139,7 @@ export type Database = {
           header?: string
           id?: number
           questionOrder?: number
+          realtimePointsNow?: number
           started?: string | null
           type?: string
         }

@@ -46,10 +46,18 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	// TODO: Check if it's already answered for this user
 
 	// Figure out points on correct answer
-	const pointsOnCorrectAnswer = 2;
+	const pointsData = await supabase
+		.from('gameQuestion')
+		.select('realtimePointsNow')
+		.eq('gameId', gameId)
+		.eq('id', questionId)
+		.single();
 
-	if (gameQuestion.data.type === 'paSparet') {
-		// TODO
+	if (pointsData.error || !pointsData.data) {
+		return error(
+			400,
+			'Unexpected error occured when trying to get current points. Scream for Ludvig to fix!'
+		);
 	}
 
 	await supabase.from('gameQuestionParticipantAnswers').insert({
@@ -57,7 +65,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		questionId: questionId,
 		answer,
 		created: new Date().toISOString(),
-		pointsOnCorrect: pointsOnCorrectAnswer
+		pointsOnCorrect: pointsData.data.realtimePointsNow
 	});
 
 	return new Response('OK', { status: 200 });

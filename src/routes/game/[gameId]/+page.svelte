@@ -1,13 +1,10 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
 	import { goto } from '$app/navigation';
-	import { supabaseClient } from '$lib/supabase/client';
-	import { fly } from 'svelte/transition';
-	import { expoOut } from 'svelte/easing';
+	import PlayersAlreadyJoined from './Component.PlayersAlreadyJoined.svelte';
+	import AlreadyJoined from './Component.AlreadyJoined.svelte';
 
 	export let data: PageServerData;
-
-	$: participants = data.participants! ?? [];
 
 	let playerName = '';
 	let phoneNumber: '';
@@ -30,39 +27,25 @@
 			})
 		});
 
-		loading = false;
-
 		if (res.ok) {
 			playerName = '';
 			phoneNumber = '';
 
-			goto(`/game/${data.game.id}/play`);
+			await goto(`/game/${data.game.id}/play`);
 		} else {
 			const body = await res.json();
 			error = body?.message ?? body.toString();
 		}
+
+		loading = false;
 	}
-
-	// Listen to new players
-	const handleNewPlayers = (payload: any) => {
-		participants = [payload.new, ...participants];
-	};
-
-	supabaseClient
-		.channel('gameParticipant')
-		.on(
-			'postgres_changes',
-			{ event: 'INSERT', schema: 'public', table: 'gameParticipant' },
-			handleNewPlayers
-		)
-		.subscribe();
 </script>
 
 <section>
 	<div class="bg-gray-200">
 		<div class="container py-6">
-			<h1>{data.game?.displayName}</h1>
-			<h3>{data.game?.description}</h3>
+			<h1>{data.game.displayName}</h1>
+			<h3>{data.game.description}</h3>
 		</div>
 	</div>
 	<div class="container py-6 flex flex-col gap-6">
@@ -99,47 +82,43 @@
 					<p class="font-semibold">Nu kör vi...</p>
 				</div>
 			{:else}
-				<div>
-					<label class="font-semibold block" for="playerName">Ditt lagnamn</label>
-					<input
-						class="input"
-						id="playerName"
-						bind:value={playerName}
-						placeholder="Team myrvägen 3"
-					/>
-				</div>
-				<div>
-					<label class="font-semibold block" for="playerName">Någon i lagets telefonnummer</label>
-					<input class="input" id="phoneNumber" bind:value={phoneNumber} placeholder="0731404990" />
-				</div>
-				{#if error}
-					<div class="bg-red-300 px-4 py-2 rounded-md">
-						{error}
+				{#if data.userHasPreviousJoin}
+					<div class="py-6">
+						<AlreadyJoined />
 					</div>
 				{/if}
-				<button on:click={() => join()} class="cta w-fit">Gå med</button>
+
+				<form class="py-6 flex flex-col gap-4">
+					<div>
+						<label class="font-semibold block" for="playerName">Ditt lagnamn</label>
+						<input
+							class="input"
+							id="playerName"
+							bind:value={playerName}
+							placeholder="Team myrvägen 3"
+						/>
+					</div>
+					<div>
+						<label class="font-semibold block" for="playerName"
+							>Någon i lagets telefonnummer (kommer inte vara offentligt)</label
+						>
+						<input
+							class="input"
+							type="number"
+							id="phoneNumber"
+							bind:value={phoneNumber}
+							placeholder="0731404990"
+						/>
+					</div>
+					{#if error}
+						<div class="bg-red-300 px-4 py-2 rounded-md">
+							{error}
+						</div>
+					{/if}
+					<button on:click={() => join()} class="cta w-fit">Gå med</button>
+				</form>
 			{/if}
 		</div>
-
-		<div class="flex flex-col gap-2">
-			<label class="font-semibold text-lg !mb-0" for="playerName">Dessa är redan med:</label>
-			<div class="flex flex-col gap-3">
-				{#each participants as participant (participant.id)}
-					<div
-						in:fly={{ duration: 1000, easing: expoOut, x: 150, y: 50 }}
-						class="bg-gray-100 px-4 py-2 rounded-md"
-					>
-						<p>
-							<strong>Lagnamn:</strong>
-							{participant.displayName}<br />(gick med: {new Date(
-								participant.lastChange
-							).toLocaleTimeString()})
-						</p>
-					</div>
-				{:else}
-					<p>N/A</p>
-				{/each}
-			</div>
-		</div>
+		<PlayersAlreadyJoined {loading} participants={data.participants} />
 	</div>
 </section>

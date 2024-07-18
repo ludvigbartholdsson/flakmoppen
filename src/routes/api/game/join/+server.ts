@@ -6,7 +6,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await request.json();
 
 	if (!body.displayName || !body.gameId || !body.phoneNumber) {
-		return error(400, 'No display name, game ID or phone number supplied');
+		return error(
+			400,
+			'Inget visningsnamn eller telefonnummer angivet! Båda fälten ovan måste vara ifyllda för att gå med i spelet.'
+		);
 	}
 
 	// Check if it exists

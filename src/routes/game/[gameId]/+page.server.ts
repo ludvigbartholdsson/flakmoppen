@@ -1,21 +1,24 @@
 import { supabase } from '$lib/server/supabase/client';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params, depends, cookies }) => {
+	depends('gameParticipants');
+
 	// Check if user is part already (maybe went back or something)
+	let userHasPreviousJoin = false;
 	const authKeys = cookies.get('gameParticipantAuthKeys');
+
 	if (authKeys) {
 		const authKeyExists = JSON.parse(authKeys).find(
 			(e: any) => e.gameId === parseInt(params.gameId)
 		)?.authKey;
 
 		if (authKeyExists) {
-			return redirect(307, `/game/${params.gameId}/play`);
+			userHasPreviousJoin = true;
 		}
 	}
 
-	depends('game');
 	const game = await supabase.from('games').select().eq('id', params.gameId).single();
 	const gameParticipants = await supabase
 		.from('gameParticipant')
@@ -28,6 +31,7 @@ export const load = (async ({ params, depends, cookies }) => {
 
 	return {
 		game: game.data,
-		participants: gameParticipants.data ?? []
+		participants: gameParticipants.data ?? [],
+		userHasPreviousJoin: userHasPreviousJoin
 	};
 }) satisfies PageServerLoad;

@@ -57,6 +57,6 @@ export const load = (async ({ cookies, params, depends }) => {
 		participant: participant.data,
 		participants: participants.sort((a, b) => new Date(b.created) - new Date(a.created)),
 		activeQuestion: activeQuestion.data ?? null,
-		activeQuestionAnswer: userAnswerDetails
+		activeQuestionAnswer: userAnswerDetails?.answer
 	};
 }) satisfies PageServerLoad;

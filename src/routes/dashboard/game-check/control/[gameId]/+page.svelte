@@ -21,6 +21,9 @@
 	let startQuestionOrder: number | null = null;
 	let extendQuestionTimeError = '';
 
+	let activatePointsError = '';
+	let activatePointsLoading = false;
+
 	const handleNewPlayers = (payload: any) => {
 		console.log('New player', payload);
 		participants = [payload.new, ...participants];
@@ -37,7 +40,35 @@
 		.subscribe();
 
 	async function activatePoints(points: number) {
-		// TODO
+		if (!data.activeQuestion) {
+			activatePointsError = 'Active question is null (3333)';
+			return;
+		}
+
+		if (activatePointsLoading) {
+			activatePointsError = 'Please wait for the previous request to complete.';
+			return;
+		}
+
+		activatePointsError = '';
+		activatePointsLoading = true;
+
+		const resp = await fetch('/api/dashboard/set-question-points', {
+			method: 'POST',
+			body: JSON.stringify({
+				gameId: data.game.id,
+				questionId: data.activeQuestion.id,
+				points: points
+			})
+		});
+
+		if (resp.ok) {
+			invalidate('game');
+		} else {
+			activatePointsError = await resp.text();
+		}
+
+		activatePointsLoading = false;
 	}
 
 	async function startQuestion(questionOrder: number) {
@@ -100,7 +131,7 @@
 		});
 
 		if (resp.ok) {
-			invalidate('game');
+			await invalidate('game');
 		} else {
 			startGameError = await resp.text();
 		}
@@ -201,7 +232,7 @@
 							<h3 class="text-green-400">FRÅGAN ÄR STARTAD</h3>
 							<p>Startad: {new Date(activeQuestion.started).toLocaleString()}</p>
 							<p>Avslutas: {new Date(activeQuestion.completed).toLocaleString()}</p>
-							<p>Poängsats om man svarar nu: TODO</p>
+							<p>Poängsats om man svarar nu: {activeQuestion.realtimePointsNow}</p>
 							<button class="cta mt-3" on:click={() => extendQuestionTime(question.id)}
 								>Förläng svarstiden med 30s</button
 							>
@@ -212,12 +243,13 @@
 							{/if}
 							{#if question.type === 'paSparet'}
 								<div class="mt-3 gap-3 flex flex-row flex-wrap">
-									<button on:click={() => activatePoints(10)} class="cta">Aktivera 10 poäng</button>
-									<button on:click={() => activatePoints(8)} class="cta">Aktivera 8 poäng</button>
-									<button on:click={() => activatePoints(5)} class="cta">Aktivera 5 poäng</button>
-									<button on:click={() => activatePoints(3)} class="cta">Aktivera 3 poäng</button>
-									<button on:click={() => activatePoints(2)} class="cta">Aktivera 2 poäng</button>
-									<button on:click={() => activatePoints(1)} class="cta">Aktivera 1 poäng</button>
+									{#each new Array(10) as _, i (i)}
+										<button
+											disabled={activatePointsLoading}
+											on:click={() => activatePoints(i + 1)}
+											class="pointsCta">Aktivera {i + 1} poäng</button
+										>
+									{/each}
 								</div>
 							{/if}
 						</div>
@@ -253,3 +285,9 @@
 		</div>
 	</div>
 </section>
+
+<style lang="postcss">
+	.pointsCta {
+		@apply bg-green-300 p-1 px-2 rounded-md;
+	}
+</style>
