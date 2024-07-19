@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { supabase } from '$lib/server/supabase/client';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	const { gameId, questionId } = await request.json();
+	const { gameId, questionId, seconds } = await request.json();
 
 	// Check permission
 	if (!locals?.user) {
@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	// Construct new time
 	const newCompleteTime = new Date(question.data.completed);
-	newCompleteTime.setSeconds(newCompleteTime.getSeconds() + 30);
+	newCompleteTime.setSeconds(newCompleteTime.getSeconds() + seconds);
 
 	// Update
 	await supabase

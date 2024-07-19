@@ -64,6 +64,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		participantId: participant.data.participantId!,
 		questionId: questionId,
 		answer,
+		gameId: gameId,
 		created: new Date().toISOString(),
 		pointsOnCorrect: pointsData.data.realtimePointsNow
 	});

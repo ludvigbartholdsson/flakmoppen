@@ -46,7 +46,6 @@ export type Database = {
           gameId: number
           id: number
           lastChange: string
-          totalPoints: number
         }
         Insert: {
           created?: string
@@ -54,7 +53,6 @@ export type Database = {
           gameId: number
           id?: number
           lastChange?: string
-          totalPoints?: number
         }
         Update: {
           created?: string
@@ -62,7 +60,6 @@ export type Database = {
           gameId?: number
           id?: number
           lastChange?: string
-          totalPoints?: number
         }
         Relationships: [
           {
@@ -157,6 +154,7 @@ export type Database = {
         Row: {
           answer: string
           created: string | null
+          gameId: number
           id: number
           participantId: number
           pointsOnCorrect: number
@@ -165,6 +163,7 @@ export type Database = {
         Insert: {
           answer: string
           created?: string | null
+          gameId: number
           id?: number
           participantId: number
           pointsOnCorrect: number
@@ -173,12 +172,20 @@ export type Database = {
         Update: {
           answer?: string
           created?: string | null
+          gameId?: number
           id?: number
           participantId?: number
           pointsOnCorrect?: number
           questionId?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "gameQuestionParticipantAnswers_gameId_fkey"
+            columns: ["gameId"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "gameQuestionParticipantAnswers_participantId_fkey"
             columns: ["participantId"]

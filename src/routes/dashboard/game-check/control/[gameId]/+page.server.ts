@@ -27,10 +27,28 @@ export const load = (async ({ params, depends }) => {
 		.limit(1)
 		.single();
 
+	const lastCompletedQuestion = await supabase
+		.from('gameQuestion')
+		.select('questionOrder')
+		.eq('gameId', params.gameId)
+		.filter('completed', 'lt', new Date().toISOString())
+		.order('completed', { ascending: false })
+		.limit(1)
+		.single();
+
+	const answeredQuestions = await supabase
+		.from('gameQuestionParticipantAnswers')
+		.select()
+		.eq('gameId', params.gameId);
+
+	console.log(answeredQuestions);
+
 	return {
 		game: game.data,
-		activeQuestion: activeQuestion.data,
-		gameQuestions: gameQuestions.data ?? [],
-		gameParticipants: gameParticipants.data ?? []
+		lastCompletedQuestionOrder: lastCompletedQuestion?.data?.questionOrder ?? 0,
+		activeQuestion: activeQuestion?.data,
+		gameQuestions: gameQuestions?.data ?? [],
+		gameParticipants: gameParticipants?.data ?? [],
+		answeredQuestions: answeredQuestions?.data ?? []
 	};
 }) satisfies PageServerLoad;

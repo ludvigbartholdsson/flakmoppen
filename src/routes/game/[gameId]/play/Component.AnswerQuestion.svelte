@@ -73,7 +73,10 @@
 
 <div class="container py-6">
 	{#if activeQuestion}
-		<h2>Fråga {activeQuestion.questionOrder}</h2>
+		<h2>Fråga {activeQuestion.header}</h2>
+		{#if activeQuestion.description}
+			<p class="mb-3">{activeQuestion.description}</p>
+		{/if}
 		{#if secondsLeftToAnswer}
 			<h3>Du har {secondsLeftToAnswer} sekunder kvar att svara!</h3>
 		{/if}
