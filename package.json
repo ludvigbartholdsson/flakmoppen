@@ -36,6 +36,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@rollup/wasm-node": "^4.18.1",
 		"@supabase/supabase-js": "^2.44.4",
 		"@vercel/analytics": "^1.3.1"
 	}
