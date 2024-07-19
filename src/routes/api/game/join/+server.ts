@@ -13,16 +13,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	// Check if game is started
-	const gameStarted = await supabase
-		.from('games')
-		.select()
-		.eq('gameId', body.gameId)
-		.limit(1)
-		.single();
+	const gameStarted = await supabase.from('games').select().eq('id', body.gameId).limit(1).single();
 
 	if (gameStarted.data?.completed) {
 		return error(400, 'Evenemanget har redan avslutats.');
 	}
+
+	console.log(gameStarted);
 
 	if (gameStarted.data?.started) {
 		// allow if username + phone number match
