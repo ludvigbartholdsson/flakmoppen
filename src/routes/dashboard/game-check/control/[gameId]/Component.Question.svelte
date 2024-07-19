@@ -23,12 +23,13 @@
 	// Answers
 	onMount(() => {
 		const handleNewAnswers = (payload: any) => {
+			console.log(payload);
 			answers = [payload.new, ...answers];
 		};
 
 		// Listen to new players
 		supabaseClient
-			.channel('gameQuestionParticipantAnswers')
+			.channel('answers')
 			.on(
 				'postgres_changes',
 				{ event: 'INSERT', schema: 'public', table: 'gameQuestionParticipantAnswers' },
@@ -147,24 +148,30 @@
 	class="bg-gray-50 border-2 border-gray-100 rounded-md p-3"
 	in:fly={{ duration: 1000, easing: expoOut, x: 150, y: 50 }}
 >
-	<div class="grid grid-cols-12">
+	<div class="grid grid-cols-12 gap-6">
 		<div class="col-span-6">
 			<div class="flex flex-row gap-2">
-				<h3 class="bg-green-400 h-8 w-8 flex items-center justify-center rounded-full">
+				<h3
+					class="bg-green-400 flex-grow flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full"
+				>
 					{question.questionOrder}
 				</h3>
-				<h3>
+				<h3 class="truncate">
 					{question.header}
 				</h3>
 			</div>
 			<p>{question.description ?? 'Ingen beskrivning lades till.'}</p>
-			<hr class="my-4" />
 			<p>Typ av fråga: {question.type === 'paSparet' ? 'På Spåret' : 'Kahoot'}</p>
 		</div>
 		<div class="col-span-6">
-			{#each answers as answer (answer.id)}
-				{answer.answer}
-			{/each}
+			<h3>Svar</h3>
+			<ol class="list-disc list-inside">
+				{#each answers as answer (answer.id)}
+					<li in:fly={{ duration: 500, easing: expoOut, x: 150, y: 50 }}>
+						{answer.answer} (poäng om det är korrekt: {answer.pointsOnCorrect})
+					</li>
+				{/each}
+			</ol>
 		</div>
 	</div>
 

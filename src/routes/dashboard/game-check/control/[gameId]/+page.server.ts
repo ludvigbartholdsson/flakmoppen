@@ -41,8 +41,6 @@ export const load = (async ({ params, depends }) => {
 		.select()
 		.eq('gameId', params.gameId);
 
-	console.log(answeredQuestions);
-
 	return {
 		game: game.data,
 		lastCompletedQuestionOrder: lastCompletedQuestion?.data?.questionOrder ?? 0,
