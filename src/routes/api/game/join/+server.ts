@@ -19,19 +19,21 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		return error(400, 'Evenemanget har redan avslutats.');
 	}
 
-	console.log(gameStarted);
-
 	if (gameStarted.data?.started) {
 		// allow if username + phone number match
 		const usernamePhoneMatch = await supabase
 			.from('gameParticipantDetails')
-			.select()
-			.eq('gameId', body.gameId)
+			.select('*, gameParticipant:participantId (gameId)')
 			.eq('phoneNumber', body.phoneNumber)
 			.limit(1)
 			.single();
 
-		if (usernamePhoneMatch.data && usernamePhoneMatch.data.authKey) {
+		// Game id does exist here thanks to the query above
+		if (
+			usernamePhoneMatch.data &&
+			usernamePhoneMatch.data.authKey &&
+			usernamePhoneMatch.data.gameParticipant.gameId === body.gameId
+		) {
 			addCookie(cookies, body.gameId, usernamePhoneMatch.data.authKey);
 			return new Response('OK', { status: 200 });
 		}

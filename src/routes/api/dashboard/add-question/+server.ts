@@ -3,7 +3,8 @@ import type { RequestHandler } from './$types';
 import { supabase } from '$lib/server/supabase/client';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	const { header, description, type, gameId, questionOrder } = await request.json();
+	const { header, description, initialTime, initialPoints, type, gameId, questionOrder } =
+		await request.json();
 
 	// Check permission
 	if (!locals?.user) {
@@ -36,7 +37,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			description,
 			type,
 			gameId,
-			questionOrder: 1
+			questionOrder: 1,
+			realtimePointsNow: initialPoints ? initialPoints : 2,
+			initialSecondsToAnswer: initialTime ? initialTime : 60
 		});
 
 		return new Response('OK', { status: 200 });
@@ -57,9 +60,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const maxOrder = maxOrderData.length ? maxOrderData[0].questionOrder : 0;
 
 	// Insert the new question with the next order
-	await supabase
-		.from('gameQuestion')
-		.insert([{ header, description, type, gameId, questionOrder: maxOrder + 1 }]);
+	await supabase.from('gameQuestion').insert([
+		{
+			header,
+			description,
+			type,
+			gameId,
+			realtimePointsNow: initialPoints ? initialPoints : 2,
+			questionOrder: maxOrder + 1,
+			initialSecondsToAnswer: initialTime ? initialTime : 60
+		}
+	]);
 
 	return new Response('OK', { status: 200 });
 };

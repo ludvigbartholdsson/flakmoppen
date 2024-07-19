@@ -10,7 +10,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return error(403, 'Unauthorized');
 	}
 
-	let completeQuestionAt = new Date(new Date().getTime() + 60000);
+	// get question
+	const { data: questionData } = await supabase
+		.from('gameQuestion')
+		.select('initialSecondsToAnswer')
+		.eq('gameId', gameId)
+		.eq('questionOrder', questionOrder)
+		.single();
+
+	if (!questionData) {
+		return error(400, 'Question was not found in Database.');
+	}
+
+	let completeQuestionAt = new Date(
+		new Date().getTime() + questionData.initialSecondsToAnswer * 1000
+	);
 
 	if (complete) {
 		if (new Date(complete) < new Date()) {

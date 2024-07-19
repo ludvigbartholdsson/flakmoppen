@@ -5,6 +5,8 @@
 	let description = '';
 	let type = 'paSparet';
 	let questionOrder = 'last';
+	let initialTime = 60;
+	let initialPoints = 2;
 
 	let loading = false;
 	let error = '';
@@ -22,7 +24,9 @@
 				description,
 				type,
 				gameId: $page.params.gameId,
-				questionOrder
+				questionOrder,
+				initialTime,
+				initialPoints
 			})
 		});
 
@@ -31,6 +35,13 @@
 		if (response.ok) {
 			success = true;
 			invalidate('game');
+
+			header = '';
+			description = '';
+			type = 'paSparet';
+			questionOrder = 'last';
+			initialTime = 60;
+			initialPoints = 2;
 		} else {
 			const result = await response.text();
 
@@ -83,6 +94,27 @@
 				type="text"
 			/>
 		</div>
+		<div class="grid grid-cols-12 gap-3">
+			<div class="col-span-6">
+				<label for="initialTime">Initial tid (kan förlängas manuellt sedan)</label>
+				<input
+					bind:value={initialTime}
+					id="initialTime"
+					class="input"
+					placeholder="Ange bara sekunder som en siffra. Tex 60 eller 115 (1 minut och 55 sek)."
+					type="number"
+				/>
+			</div>
+			<div class="col-span-6">
+				<label for="initialPoints">Initiala poäng (kan också bytas manuellt sedan)</label>
+				<select id="initialPoints" class="input w-fit" bind:value={initialPoints}>
+					{#each [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as value}
+						<option {value}>{value} poäng vid rätt svar</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
 		<div>
 			<label for="header">Typ av fråga</label>
 			<select class="input w-fit" bind:value={type}>

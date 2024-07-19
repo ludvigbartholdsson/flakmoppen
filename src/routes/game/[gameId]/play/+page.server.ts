@@ -12,7 +12,6 @@ export const load = (async ({ cookies, params, depends }) => {
 	}
 
 	const authKey = JSON.parse(authKeys).find((e) => e.gameId === parseInt(params.gameId))?.authKey;
-
 	if (!authKey) {
 		return {
 			participant: null
@@ -25,6 +24,17 @@ export const load = (async ({ cookies, params, depends }) => {
 		.select()
 		.eq('authKey', authKey)
 		.single();
+
+	if (!participant?.data) {
+		cookies.set('gameParticipantAuthKeys', '', {
+			path: '/',
+			maxAge: 1
+		});
+
+		return {
+			participant: null
+		};
+	}
 
 	const participants =
 		(await supabase.from('gameParticipant').select().eq('gameId', params.gameId)).data ?? [];

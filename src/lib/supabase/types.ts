@@ -113,6 +113,7 @@ export type Database = {
           gameId: number
           header: string
           id: number
+          initialSecondsToAnswer: number | null
           questionOrder: number
           realtimePointsNow: number
           started: string | null
@@ -124,6 +125,7 @@ export type Database = {
           gameId: number
           header: string
           id?: number
+          initialSecondsToAnswer?: number | null
           questionOrder: number
           realtimePointsNow?: number
           started?: string | null
@@ -135,6 +137,7 @@ export type Database = {
           gameId?: number
           header?: string
           id?: number
+          initialSecondsToAnswer?: number | null
           questionOrder?: number
           realtimePointsNow?: number
           started?: string | null

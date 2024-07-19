@@ -4,12 +4,17 @@
 	import type { Tables } from '$lib/supabase/types';
 	import { supabaseClient } from '$lib/supabase/client';
 	import { onMount } from 'svelte';
+	import { invalidate } from '$app/navigation';
 
 	export let participants: Tables<'gameParticipant'>[];
 
 	onMount(() => {
 		const handleNewPlayers = (payload: any) => {
 			participants = [payload.new, ...participants];
+		};
+
+		const handleRemovePlayers = (payload: any) => {
+			invalidate('game');
 		};
 
 		// Listen to new players
@@ -19,6 +24,16 @@
 				'postgres_changes',
 				{ event: 'INSERT', schema: 'public', table: 'gameParticipant' },
 				handleNewPlayers
+			)
+			.subscribe();
+
+		// Listen to new players
+		supabaseClient
+			.channel('gameParticipantDelete')
+			.on(
+				'postgres_changes',
+				{ event: 'DELETE', schema: 'public', table: 'gameParticipant' },
+				handleRemovePlayers
 			)
 			.subscribe();
 	});

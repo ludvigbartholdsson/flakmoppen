@@ -38,7 +38,7 @@ export const load = (async ({ params, depends }) => {
 
 	const answeredQuestions = await supabase
 		.from('gameQuestionParticipantAnswers')
-		.select()
+		.select('*, gameParticipant (displayName)')
 		.eq('gameId', params.gameId);
 
 	return {

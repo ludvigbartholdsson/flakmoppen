@@ -32,14 +32,15 @@
 			})
 		});
 
-		answerLoading = false;
-
 		if (resp.ok) {
 			await invalidate('game');
 			answerToQuestion = '';
 			answerError = '';
+			answerLoading = false;
 			return;
 		}
+
+		answerLoading = false;
 
 		const respBody = await resp.text();
 		answerError = `Något gick fel när svaret skulle skickas in. Felmeddelande: ${respBody}`;
@@ -73,12 +74,15 @@
 
 <div class="container py-6">
 	{#if activeQuestion}
-		<h2>Fråga {activeQuestion.header}</h2>
+		<h2>Fråga: {activeQuestion.header}</h2>
 		{#if activeQuestion.description}
 			<p class="mb-3">{activeQuestion.description}</p>
 		{/if}
 		{#if secondsLeftToAnswer}
-			<h3>Du har {secondsLeftToAnswer} sekunder kvar att svara!</h3>
+			<h3>
+				Du har {secondsLeftToAnswer} sekunder kvar att svara! Om du svarar NU får du {activeQuestion.realtimePointsNow}
+				poäng!
+			</h3>
 		{/if}
 		{#if answerLoading}
 			<div role="status" class="flex flex-row gap-3 items-center">

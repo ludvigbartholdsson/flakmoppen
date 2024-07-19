@@ -23,7 +23,7 @@
 	// Answers
 	onMount(() => {
 		const handleNewAnswers = (payload: any) => {
-			console.log(payload);
+			if (payload.new.questionId !== question.id || payload.new.gameId != game.id) return;
 			answers = [payload.new, ...answers];
 		};
 
@@ -37,6 +37,8 @@
 			)
 			.subscribe();
 	});
+
+	onDestroy(() => supabaseClient.realtime.channel('answers').unsubscribe());
 
 	// Listen to question updates
 	let activeQuestionTimer: NodeJS.Timeout | null = null;
@@ -152,7 +154,7 @@
 		<div class="col-span-6">
 			<div class="flex flex-row gap-2">
 				<h3
-					class="bg-green-400 flex-grow flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full"
+					class="bg-green-400 flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full"
 				>
 					{question.questionOrder}
 				</h3>
@@ -165,10 +167,17 @@
 		</div>
 		<div class="col-span-6">
 			<h3>Svar</h3>
-			<ol class="list-disc list-inside">
+			<ol class="list-disc flex flex-col gap-2 list-inside">
 				{#each answers as answer (answer.id)}
-					<li in:fly={{ duration: 500, easing: expoOut, x: 150, y: 50 }}>
-						{answer.answer} (poäng om det är korrekt: {answer.pointsOnCorrect})
+					<li
+						class="bg-gray-100 px-4 py-2 rounded-md flex flex-col"
+						in:fly={{ duration: 500, easing: expoOut, x: 150, y: 50 }}
+					>
+						<!-- Detta finns faktiskt... https://supabase.com/docs/guides/database/joins-and-nesting?queryGroups=language&language=js -->
+						<span class="text-lg font-semibold"
+							>Lag: {answer?.gameParticipant?.displayName ?? '(Syns snart)'}</span
+						>
+						Svar: "{answer.answer}" (värt {answer.pointsOnCorrect}p)
 					</li>
 				{/each}
 			</ol>
@@ -202,6 +211,11 @@
 							class="pointsCta">Aktivera {i} poäng</button
 						>
 					{/each}
+					{#if activatePointsError}
+						<div class="bg-red-300 px-4 py-2 rounded-md">
+							{activatePointsError}
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -211,8 +225,9 @@
 		<div>
 			<hr class="my-4" />
 			{#if question.type === 'kahoot'}
+				<p>Frågan är initialt värd: {question.realtimePointsNow}</p>
 				<label class="block" for="startQuestionCompleted"
-					>När ska frågan avslutas? Standard 1 minut från att du klickar på den gröna knappen!</label
+					>När ska frågan avslutas? Inlagd standard tid för denna fråga är: {question.initialSecondsToAnswer}s</label
 				>
 				<input
 					id="startQuestionCompleted"

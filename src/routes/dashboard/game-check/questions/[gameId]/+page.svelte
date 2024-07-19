@@ -35,6 +35,8 @@
 						<p>{question.description ?? 'Ingen beskrivning lades till.'}</p>
 						<hr class="my-4" />
 						<p>Typ av fråga: {question.type === 'paSparet' ? 'På Spåret' : 'Kahoot'}</p>
+						<p>Initial poängsats: {question.realtimePointsNow}p</p>
+						<p>Initial tid att svara: {question.initialSecondsToAnswer}p</p>
 					</div>
 				{/each}
 			</div>
