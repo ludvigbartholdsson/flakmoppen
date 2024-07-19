@@ -88,35 +88,60 @@
 					</div>
 				{/if}
 
-				<form class="py-6 flex flex-col gap-4">
-					<div>
-						<label class="font-semibold block" for="playerName">Ditt lagnamn</label>
-						<input
-							class="input"
-							id="playerName"
-							bind:value={playerName}
-							placeholder="Team myrvägen 3"
-						/>
-					</div>
-					<div>
-						<label class="font-semibold block" for="playerName"
-							>Någon i lagets telefonnummer (kommer inte vara offentligt)</label
-						>
-						<input
-							class="input"
-							type="number"
-							id="phoneNumber"
-							bind:value={phoneNumber}
-							placeholder="0731404990"
-						/>
-					</div>
-					{#if error}
-						<div class="bg-red-300 px-4 py-2 rounded-md">
-							{error}
+				{#if !data.game.started}
+					<form class="py-6 flex flex-col gap-4">
+						<div>
+							<label class="font-semibold block" for="playerName">Ditt lagnamn</label>
+							<input
+								class="input"
+								id="playerName"
+								bind:value={playerName}
+								placeholder="Team myrvägen 3"
+							/>
 						</div>
-					{/if}
-					<button on:click={() => join()} class="cta w-fit">Gå med</button>
-				</form>
+						<div>
+							<label class="font-semibold block" for="playerName"
+								>Någon i lagets telefonnummer (kommer inte vara offentligt)</label
+							>
+							<input
+								class="input"
+								type="number"
+								id="phoneNumber"
+								bind:value={phoneNumber}
+								placeholder="0731404990"
+							/>
+						</div>
+						{#if error}
+							<div class="bg-red-300 px-4 py-2 rounded-md">
+								{error}
+							</div>
+						{/if}
+						<button on:click={() => join()} class="cta w-fit">Gå med</button>
+					</form>
+				{:else}
+					<form class="py-6 flex flex-col gap-4">
+						<h2>
+							Spelet har redan startat -- du kan bara gå med igen om du redan har gjort ett lag och
+							kommer ihåg ditt telefonnummer.
+						</h2>
+						<div>
+							<label class="font-semibold block" for="playerName">Telefonnumret ni använde</label>
+							<input
+								class="input"
+								type="number"
+								id="phoneNumber"
+								bind:value={phoneNumber}
+								placeholder="0731404990"
+							/>
+						</div>
+						{#if error}
+							<div class="bg-red-300 px-4 py-2 rounded-md">
+								{error}
+							</div>
+						{/if}
+						<button on:click={() => join()} class="cta w-fit">Gå med</button>
+					</form>
+				{/if}
 			{/if}
 		</div>
 		<PlayersAlreadyJoined {loading} participants={data.participants} />
