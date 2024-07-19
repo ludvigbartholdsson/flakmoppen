@@ -147,18 +147,25 @@
 	class="bg-gray-50 border-2 border-gray-100 rounded-md p-3"
 	in:fly={{ duration: 1000, easing: expoOut, x: 150, y: 50 }}
 >
-	<div>
-		<div class="flex flex-row gap-2">
-			<h3 class="bg-green-400 h-8 w-8 flex items-center justify-center rounded-full">
-				{question.questionOrder}
-			</h3>
-			<h3>
-				{question.header}
-			</h3>
+	<div class="grid grid-cols-12">
+		<div class="col-span-6">
+			<div class="flex flex-row gap-2">
+				<h3 class="bg-green-400 h-8 w-8 flex items-center justify-center rounded-full">
+					{question.questionOrder}
+				</h3>
+				<h3>
+					{question.header}
+				</h3>
+			</div>
+			<p>{question.description ?? 'Ingen beskrivning lades till.'}</p>
+			<hr class="my-4" />
+			<p>Typ av fråga: {question.type === 'paSparet' ? 'På Spåret' : 'Kahoot'}</p>
 		</div>
-		<p>{question.description ?? 'Ingen beskrivning lades till.'}</p>
-		<hr class="my-4" />
-		<p>Typ av fråga: {question.type === 'paSparet' ? 'På Spåret' : 'Kahoot'}</p>
+		<div class="col-span-6">
+			{#each answers as answer (answer.id)}
+				{answer.answer}
+			{/each}
+		</div>
 	</div>
 
 	{#if activeQuestion && activeQuestion.id === question.id}

@@ -24,7 +24,7 @@
 </script>
 
 <section>
-	<img class="w-full object-cover h-56" src="/images/landing-page/hero.png" alt="" />
+	<img class="w-full object-cover h-56" src="/images/landing-page/hero.jpg" alt="" />
 	<div class="container py-6">
 		<h1>Välkommen!</h1>
 		<h3>
