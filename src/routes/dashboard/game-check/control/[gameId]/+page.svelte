@@ -36,14 +36,6 @@
 			{/each}
 		</div>
 	</div>
-	<div class="container py-6">
-		<h2>Svar</h2>
-		<div class="flex flex-col gap-3 mt-3">
-			{#each data.answeredQuestions as question (question.id)}
-				{question.answer}
-			{/each}
-		</div>
-	</div>
 </section>
 
 <style lang="postcss">
