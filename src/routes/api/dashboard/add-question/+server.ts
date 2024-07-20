@@ -38,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			type,
 			gameId,
 			questionOrder: 1,
-			realtimePointsNow: initialPoints ? initialPoints : 2,
+			realtimePointsNow: typeof initialPoints === 'number' ? initialPoints : 2,
 			initialSecondsToAnswer: initialTime ? initialTime : 60
 		});
 
@@ -66,7 +66,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			description,
 			type,
 			gameId,
-			realtimePointsNow: initialPoints ? initialPoints : 2,
+			realtimePointsNow: typeof initialPoints === 'number' ? initialPoints : 2,
 			questionOrder: maxOrder + 1,
 			initialSecondsToAnswer: initialTime ? initialTime : 60
 		}
